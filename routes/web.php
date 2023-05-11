@@ -35,6 +35,7 @@ Route::group(['prefix'=>'dashboard','middleware'=>['auth','checkMenuPermission']
         Route::group(['prefix'=>'organisation-type'],function(){
             Route::get('/','OrganisationTypeController@index');
             Route::get('/get-data','OrganisationTypeController@dataTables');
+            Route::get('/get-list','OrganisationTypeController@getList');
             Route::post('/add','OrganisationTypeController@store');
             Route::post('/delete','OrganisationTypeController@destroy');
         });
@@ -78,6 +79,7 @@ Route::group(['prefix'=>'dashboard','middleware'=>['auth','checkMenuPermission']
         Route::get('/get-province',"MainController@getProvince");
         Route::get('/get-city',"MainController@getCity");
         Route::get('/get-district',"MainController@getDistrict");
+        Route::get('/get-village',"MainController@getVillage");
         Route::group(['prefix'=>'province'],function(){
             Route::get('/','ProvinceController@index');
             Route::get('/get-data','ProvinceController@dataTables');

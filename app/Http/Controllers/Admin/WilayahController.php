@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use App\Models\Master\Wilayah;
+use App\Http\Requests\Admin\WilayahRequest;
+use App\Http\Controllers\ApiLogController as ApiLog;
+use DataTables,Session;
 class WilayahController extends Controller
 {
     function __construct()
@@ -13,21 +16,14 @@ class WilayahController extends Controller
     }
     public function index()
     {
-        $this->data['roles'] = $this->ApiLog->getRoleList();
-        $this->data['wilayahs'] = $this->ApiLog->getWilayahList();
-        return view('main.master.data.wilayah')->with($this->data);
+        return view('main.master.data.wilayah');
     }
     public function dataTables(Request $request)
     {
-        $datas = User::with(['role','wilayah']);
-        $datas->where('id','!=',Auth::user()->id);
-        $datas->orderBy('created_at','desc');
+        $datas = Wilayah::query();
         return Datatables::of($datas)
         ->addIndexColumn()
         ->removeColumn('id')
-        ->addColumn('wilayahName',function($data){
-            return $data->wilayah->wilayah_name;
-        })
         ->addColumn('action',function($data){
             $button = "
             <button type='button' onclick="."Edit(".$data->id.")"." class='btn btn-warning btn-icon'>
@@ -40,5 +36,9 @@ class WilayahController extends Controller
             return $button;
         })
         ->make();
+    }
+    public function store(Request $request)
+    {
+        return $request->all();
     }
 }
