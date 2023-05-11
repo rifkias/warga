@@ -145,8 +145,9 @@ class Menu extends Model
     public function getUniqueGroup()
     {
         return Menu::hasGroup()
+            ->nullParent()
             ->orderBy('sort','ASC')
-            ->get('menu_group')
+            ->get(['sort','menu_group'])
             ->unique('menu_group')
             ->pluck('menu_group');
     }
