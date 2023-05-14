@@ -10,7 +10,7 @@
 @section('content')
     <nav class="page-breadcrumb">
         <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#">Master Data</a></li>
+        <li class="breadcrumb-item"><a href="#">System Config</a></li>
         <li class="breadcrumb-item active" aria-current="page">Role</li>
         </ol>
   </nav>

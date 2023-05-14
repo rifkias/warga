@@ -67,9 +67,14 @@ Route::group(['prefix'=>'dashboard','middleware'=>['auth','checkMenuPermission']
             Route::get('/','OrganisationController@index');
             Route::get('/get-data','OrganisationController@dataTables');
             Route::post('/add','OrganisationController@store');
-            Route::post('/show','OrganisationController@show');
-            Route::post('/update','OrganisationController@update');
             Route::post('/delete','OrganisationController@destroy');
+        });
+        Route::group(['prefix'=>'house','namespace'=>'Admin'],function(){
+            Route::get('/','HouseController@index');
+            Route::get('/get-data','HouseController@dataTables');
+            Route::post('/add','HouseController@store');
+            Route::post('/show','HouseController@show');
+            Route::post('/delete','HouseController@destroy');
         });
     });
     Route::group(['prefix'=>'master-wilayah','namespace'=>'MasterWilayah'],function(){
@@ -108,7 +113,7 @@ Route::group(['prefix'=>'dashboard','middleware'=>['auth','checkMenuPermission']
         });
     });
 });
-// Route::fallback('ApiLogController@fallback');
+Route::fallback('ApiLogController@fallback');
 
 Route::group(['prefix' => 'template'], function(){
     Route::get('/', function () {

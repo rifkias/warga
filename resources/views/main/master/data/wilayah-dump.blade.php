@@ -63,9 +63,11 @@
                 @csrf
                 <input type="hidden" name="id" id="id">
                 <div class="form-group mb-2">
-                    <label for="provinsi" class="mb-0 required">Provinsi</label>
-                    <input type="text" value="{{old('provinsi')}}" required class="form-control @error('provinsi') is-invalid @enderror" name="provinsi" id="provinsi">
+                    <label for="provinceSelect" class="mb-0 required">Provinsi</label>
+                    <select id="provinceSelect" name="provinsi" required class="select2 w-100 @error('provinsi') is-invalid @enderror">
+                        <option value="" selected>&nbsp;</option>
 
+                    </select>
                     @error('provinsi')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -73,8 +75,11 @@
                     @enderror
                 </div>
                 <div class="form-group mb-2">
-                    <label for="kabupaten" class="mb-0 required">Kabupaten</label>
-                    <input type="text" value="{{old('kabupaten')}}" required class="form-control @error('kabupaten') is-invalid @enderror" name="kabupaten" id="kabupaten">
+                    <label for="citySelect" class="mb-0 required">Kabupaten</label>
+                    <select id="citySelect" name="kabupaten" required class="select2 w-100 @error('kabupaten') is-invalid @enderror">
+                        <option value="" selected>&nbsp;</option>
+
+                    </select>
                     @error('kabupaten')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -82,8 +87,11 @@
                     @enderror
                 </div>
                 <div class="form-group mb-2">
-                    <label for="kecamatan" class="mb-0 required">Kecamatan</label>
-                    <input type="text" value="{{old('kecamatan')}}" required class="form-control @error('kecamatan') is-invalid @enderror" name="kecamatan" id="kecamatan">
+                    <label for="districtSelect" class="mb-0 required">Kecamatan</label>
+                    <select name="kecamatan" id="districtSelect" required class="select2 w-100 @error('kecamatan') is-invalid @enderror">
+                        <option value="" selected>&nbsp;</option>
+
+                    </select>
                     @error('kecamatan')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -91,8 +99,11 @@
                     @enderror
                 </div>
                 <div class="form-group mb-2">
-                    <label for="kelurahan" class="mb-0 required">Kelurahan</label>
-                    <input type="text" value="{{old('kelurahan')}}" required class="form-control @error('kelurahan') is-invalid @enderror" name="kelurahan" id="kelurahan">
+                    <label for="villageSelect" class="mb-0 required">Kelurahan</label>
+                    <select name="kelurahan" id="villageSelect" required class="select2 w-100 @error('kelurahan') is-invalid @enderror">
+                        <option value="" selected>&nbsp;</option>
+
+                    </select>
                     @error('kelurahan')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -101,7 +112,7 @@
                 </div>
                 <div class="form-group mb-2">
                     <label for="kode_pos" class="mb-0 required">Postal Code</label>
-                    <input type="number" value="{{old('kode_pos')}}" required class="form-control @error('kode_pos') is-invalid @enderror" name="kode_pos" id="kode_pos">
+                    <input type="text" value="{{old('kode_pos')}}" required class="form-control @error('kode_pos') is-invalid @enderror" name="kode_pos" id="kode_pos">
                     @error('kode_pos')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -112,7 +123,7 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label required" for="rw">RW</label>
-                            <input type="number" value="{{old('rw')}}" required class="form-control  @error('rw') is-invalid @enderror" id="rw" name="rw">
+                            <input type="text" value="{{old('rw')}}" required class="form-control  @error('rw') is-invalid @enderror" id="rw" name="rw">
                             @error('rw')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -123,7 +134,7 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label" for="rt">RT</label>
-                            <input type="number" value="{{old('rt')}}" class="form-control  @error('rt') is-invalid @enderror" id="rt" name="rt">
+                            <input type="text" value="{{old('rt')}}" class="form-control  @error('rt') is-invalid @enderror" id="rt" name="rt">
                             @error('rt')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -156,6 +167,13 @@
 <script>
         var link = '/dashboard/config/wilayah';
         var aTable;
+        var provinceId;
+        var cityId;
+        var districtId;
+        var $provinceSelect = $("#provinceSelect");
+        var $citySelect = $("#citySelect");
+        var $districtSelect = $("#districtSelect");
+        var $villageSelect = $("#villageSelect");
     $(document).ready( function () {
         $(function() {
             'use strict';
@@ -210,41 +228,227 @@
                     }
                 });
             });
+            if ($(".select2").length) {
+                $(".select2").select2({
+                    width:'100%'
+                });
+            }
+            if ($provinceSelect.length) {
+                $provinceSelect.select2({
+                    width:'100%',
+                    delay:1800,
+                    minimumInputLength:3,
+                    selectOnClose: true,
+                    ajax:{
+                        url:'/dashboard/master-wilayah/get-province',
+                        dataType: 'json',
+                        quietMillis: 100,
+                        data:function(param){
+                            var query ={
+                                name:param.term,
+                            }
+                            return query;
+                        },
+                        processResults:function(data){
+                            return {
+                                results: $.map(data,function(obj){
+                                    return {id:obj.province_name,text:obj.province_name,dataId:obj.id}
+                                })
+                            };
+                        }
+                    },
+                }).on("select2:select",function(e){
+                    provinceId = e.params.data.dataId;
+                    if(provinceId !== ''){
+                        $citySelect.select2('enable');
+                    }else{
+                        $citySelect.select2('disable');
+                    }
+                });
+            }
+            if ($citySelect.length) {
+                $("#citySelect").select2({
+                    width:'100%',
+                    delay:1800,
+                    minimumInputLength:3,
+                    ajax:{
+                        url:'/dashboard/master-wilayah/get-city',
+                        dataType: 'json',
+                        quietMillis: 100,
+                        data:function(param){
+                            var query ={
+                                province_id:provinceId,
+                                name:param.term,
+                            }
+                            return query;
+                        },
+                        processResults:function(data){
+                            return {
+                                results: $.map(data,function(obj){
+                                    return {id:obj.city_name,text:obj.city_name,dataId:obj.id}
+                                })
+                            };
+                        }
+                    },
+                }).on("select2:select",function(e){
+                    cityId = e.params.data.dataId;
+                    if(cityId !== ''){
+                        $districtSelect.select2('enable');
+                    }else{
+                        $districtSelect.select2('disable');
+                    }
+                });
+            }
+            if ($districtSelect.length) {
+                $districtSelect.select2({
+                    width:'100%',
+                    delay:1800,
+                    minimumInputLength:3,
+                    ajax:{
+                        url:'/dashboard/master-wilayah/get-district',
+                        dataType: 'json',
+                        quietMillis: 100,
+                        data:function(param){
+                            var query ={
+                                city_id:cityId,
+                                name:param.term,
+                            }
+                            return query;
+                        },
+                        processResults:function(data){
+                            return {
+                                results: $.map(data,function(obj){
+                                    return {id:obj.district_name,text:obj.district_name,dataId:obj.id}
+                                })
+                            };
+                        }
+                    },
+                }).on("select2:select",function(e){
+                    districtId = e.params.data.dataId;
+                    if(districtId !== ''){
+                        $villageSelect.select2('enable');
+                    }else{
+                        $villageSelect.select2('disable');
+                    }
+                });;
+            }
+            if ($villageSelect.length) {
+                $villageSelect.select2({
+                    width:'100%',
+                    delay:1800,
+                    minimumInputLength:3,
+                    ajax:{
+                        url:'/dashboard/master-wilayah/get-village',
+                        dataType: 'json',
+                        quietMillis: 100,
+                        data:function(param){
+                            var query ={
+                                district_id:districtId,
+                                name:param.term,
+                            }
+                            return query;
+                        },
+                        processResults:function(data){
+                            return {
+                                results: $.map(data,function(obj){
+                                    return {id:obj.village_name,text:obj.village_name}
+                                })
+                            };
+                        }
+                    },
+                });
+            }
+            @if(!count($errors) > 0)
+            // Disable Select2
+                if($citySelect.data('select2')){
+                    $citySelect.select2("enable",false);
+                }
+                if($districtSelect.data('select2')){
+                    $districtSelect.select2("enable",false);
+                }
+                if($villageSelect.data('select2')){
+                    $villageSelect.select2("enable",false);
+                }
+            // End Disable
+            @endif
         });
         @if(count($errors) > 0)
+            var oldProvinsi = "{{old('provinsi')}}";
+            var oldKabupaten = "{{old('kabupaten')}}";
+            var oldKecamatan = "{{old('kecamatan')}}";
+            var oldKelurahan = "{{old('kelurahan')}}";
+            console.log(oldProvinsi,
+            oldKabupaten,
+            oldKecamatan,
+            oldKelurahan,
+            );
             @if(old('id'))
                 $('#dataModalTitle').text("Edit Data");
-                $('#formData').attr('action',this.link+'/update');
+                $('#password').attr('required',false);
             @else
                 $('#dataModalTitle').text("Add Data");
-                $('#formData').attr('action',this.link+'/add');
+                $('#password').attr('required',true);
             @endif
+
+            $provinceSelect
+            .empty()
+            .append($("<option/>")
+                .val(oldProvinsi)
+                .text(oldProvinsi)
+            ).val(oldProvinsi)
+            .trigger("change");
+
+            $citySelect
+            .empty()
+            .append($("<option/>")
+                .val(oldKabupaten)
+                .text(oldKabupaten)
+            ).val(oldKabupaten)
+            .trigger("change");
+
+            $districtSelect
+            .empty()
+            .append($("<option/>")
+                .val(oldKecamatan)
+                .text(oldKecamatan)
+            ).val(oldKecamatan)
+            .trigger("change");
+
+            $villageSelect
+            .empty()
+            .append($("<option/>")
+                .val(oldKelurahan)
+                .text(oldKelurahan)
+            ).val(oldKelurahan)
+            .trigger("change");
+
             $('#dataModal').modal('show');
         @endif
     });
     function clearData(){
         $('#dataModalTitle').text("Add Data");
+        $('#name').val('');
         $('#formData').attr('action',this.link+'/add');
-        $('#provinsi').val('');
-        $('#kabupaten').val('');
-        $('#kecamatan').val('');
-        $('#kelurahan').val('');
-        $('#kode_pos').val('');
-        $('#rw').val('');
-        $('#rt').val('');
+        $('#emailField').attr('value','');
+        $('#password').val('');
+        $('#password').attr('required',true);
+        $('#status').val('active').trigger('change');
+        $('#role').val('').trigger('change');
         $('#id').val('');
+        $('#wilayah').val('').trigger('change');
+        $('#picture').val('');
     }
     function ShowDetail(data){
+        console.log(data);
         $('#formData').attr('action',this.link+'/update');
         $('#dataModalTitle').text("Edit Data");
-        $('#provinsi').val(data.provinsi);
-        $('#kecamatan').val(data.kecamatan);
-        $('#kabupaten').val(data.kabupaten);
-        $('#kelurahan').val(data.kelurahan);
-        $('#kode_pos').val(data.kode_pos);
-        $('#rw').val(data.rw);
-        $('#rt').val(data.rt);
+        $('#name').val(data.name);
         $('#id').val(data.id);
+        $('#emailField').attr('value',data.email);
+        $('#password').attr('required',false);
+        $('#status').val(data.status);
+        $('#role').val(data.role_id).trigger('change');
+        $('#wilayah').val(data.wilayah_id).trigger('change');
         $('#dataModal').modal('show');
 
     }

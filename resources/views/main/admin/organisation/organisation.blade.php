@@ -11,7 +11,7 @@
     <nav class="page-breadcrumb">
         <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">Master Data</a></li>
-        <li class="breadcrumb-item active" aria-current="page">User</li>
+        <li class="breadcrumb-item active" aria-current="page">Organisation</li>
         </ol>
   </nav>
 
@@ -29,13 +29,10 @@
             <table id="dataTables" class="table table-bordered">
               <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Organisation Type</th>
+                    <th>No</th>
                     <th>Wilayah</th>
-                    <th>Images</th>
+                    <th>Type</th>
+                    <th>Parent</th>
                     <th>Action</th>
                 </tr>
               </thead>
@@ -62,64 +59,25 @@
                 @csrf
                 <input type="hidden" name="id" id="id">
                 <div class="form-group mb-2">
-                    <label for="name" class="mb-0 required">Name</label>
-                    <input type="text" value="{{old('name')}}" required class="form-control @error('name') is-invalid @enderror" name="name" id="name" placeholder="Name">
-                    @error('name')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-                <div class="form-group mb-2">
-                    <label for="iniEmail" class="mb-0 required">Email</label>
-                    <input type="email" value="{{old('email')}}" required class="form-control @error('email') is-invalid @enderror" name="email" id="emailField" placeholder="Email">
-                    @error('email')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-                <div class="form-group mb-2">
-                    <label for="password" class="mb-0 required">Password</label>
-                    <input type="password" value="{{old('password')}}" required class="form-control @error('password') is-invalid @enderror" name="password" id="password" placeholder="Password" autoComplete="new-password">
-                    @error('password')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-                <div class="form-group mb-2">
-                    <label for="status" class="mb-0 required">Status</label>
-                    <select name="status" id="status" required class="form-control @error('status') is-invalid @enderror">
-                        <option @if(old('status') == 'active') selected @endif value="active">Active</option>
-                        <option @if(old('status') == 'deactive') selected @endif value="deactive">Deactive</option>
-                    </select>
-                    @error('status')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-                <div class="form-group mb-2">
-                    <label for="role" class="mb-0 required">Role</label>
-                    <select name="role_id" id="role" required class="select2 w-100 @error('role_id') is-invalid @enderror">
+                    <label for="organisation_type_id" class="mb-0 required">Type</label>
+                    <select name="organisation_type_id" required id="organisation_type_id" class="select2 w-100 @error('organisation_type_id') is-invalid @enderror">
                         <option value="" selected>&nbsp;</option>
-                        @foreach ($roles as $item)
-                            <option @if(old('role_id') == $item->id) selected @endif value="{{$item->id}}">{{$item->name}}</option>
+                        @foreach ($type as $item)
+                            <option @if(old('organisation_type_id') == $item->id) selected @endif value="{{$item->id}}">{{$item->name}}</option>
                         @endforeach
                     </select>
-                    @error('role_id')
+                    @error('organisation_type_id')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror
                 </div>
                 <div class="form-group mb-2">
-                    <label for="wilayah" class="mb-0 required">Wilayah</label>
-                    <select name="wilayah_id" id="wilayah" required class="select2 w-100 @error('wilayah_id') is-invalid @enderror">
+                    <label for="wilayah_id" class="mb-0 required">Wilayah</label>
+                    <select name="wilayah_id" id="wilayah_id" required class="select2 w-100 @error('wilayah_id') is-invalid @enderror">
                         <option value="" selected>&nbsp;</option>
-                        @foreach ($organisasi as $item)
-                            <option @if(old('wilayah_id') == $item->id) selected @endif value="{{$item->id}}">{{$item->wilayah_id}}</option>
+                        @foreach ($wilayahs as $item)
+                            <option @if(old('wilayah_id') == $item->id) selected @endif value="{{$item->id}}">{{$item->wilayah_name}}</option>
                         @endforeach
                     </select>
                     @error('wilayah_id')
@@ -128,21 +86,22 @@
                         </span>
                     @enderror
                 </div>
+                @if(\Auth::user()->role()->first()->name == 'superadmin')
                 <div class="form-group mb-2">
-                    <label for="picture" class="mb-0">Pict</label>
-                    <input type="file" id="picture" name="picture" class="file-upload-default @error('picture') is-invalid @enderror">
-                    <div class="input-group col-xs-12">
-                        <input type="text" class="form-control file-upload-info @error('picture') is-invalid @enderror" name="picture" disabled="" placeholder="Upload Image">
-                        <span class="input-group-append">
-                            <button class="file-upload-browse btn btn-primary" type="button">Upload</button>
-                        </span>
-                    </div>
-                    @error('picture')
+                    <label for="parent_id" class="mb-0">Parent</label>
+                    <select name="parent_id" id="parent_id" class="select2 w-100 @error('parent_id') is-invalid @enderror">
+                        <option value="" selected>&nbsp;</option>
+                        @foreach ($parent as $item)
+                            <option @if(old('parent_id') == $item->id) selected @endif value="{{$item->id}}">{{$item->wilayah->wilayah_name}}</option>
+                        @endforeach
+                    </select>
+                    @error('parent_id')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror
                 </div>
+                @endif
           </form>
         </div>
         <div class="modal-footer">
@@ -165,7 +124,7 @@
 
 @push('custom-scripts')
 <script>
-        var link = '/dashboard/master-data/user';
+        var link = '/dashboard/master-data/organisation';
         var aTable;
     $(document).ready( function () {
         $(function() {
@@ -184,13 +143,11 @@
                         { className: "text-center",targets:'_all'}
                     ],
                     columns: [
-                        { data: 'name', name: 'name',autoWidth: true },
-                        { data: 'email', name: 'email',autoWidth: true },
-                        { data: 'role.name', name: 'role.name',autoWidth: true },
-                        { data: 'status', name: 'status',autoWidth: true },
-                        { data: 'organisation.type.name', name: 'organisation.type.name',autoWidth: true },
+                        { data: 'DT_RowIndex', name: 'DT_RowIndex',autoWidth: true,orderable:false,searchable:false},
                         { data: 'wilayahName', name: 'wilayahName',autoWidth: true },
-                        { data: 'picture', name: 'picture',autoWidth: true },
+                        { data: 'type.name', name: 'type.name',autoWidth: true },
+
+                        { data: 'parentName', name: 'parentName',autoWidth: true },
                         {data:'action',name:'action',orderable:false,searchable:false},
                     ],
                     "aLengthMenu": [
@@ -223,6 +180,31 @@
             if ($(".select2").length) {
                 $(".select2").select2({
                     width:'100%'
+                });
+            }
+            if ($("#typeSelect").length) {
+                $("#typeSelect").select2({
+                    width:'100%',
+                    delay:1800,
+                    selectOnClose: true,
+                    ajax:{
+                        url:'/dashboard/config/organisation-type/get-data',
+                        dataType: 'json',
+                        quietMillis: 100,
+                        data:function(param){
+                            var query ={
+                                name:param.term,
+                            }
+                            return query;
+                        },
+                        processResults:function(res){
+                            return {
+                                results: $.map(res.data,function(obj){
+                                    return {id:obj.id,text:obj.name}
+                                })
+                            };
+                        }
+                    },
                 });
             }
         });

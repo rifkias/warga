@@ -25,9 +25,9 @@ class OrganisationRequest extends FormRequest
     public function rules()
     {
         return [
-            'organisation_type_id'=>['required',Rule::exists('organisation_types','id',$this->organisation_type_id)],
-            'wilayah_id'=>['required',Rule::exists('wilayah','id',$this->wilayah_id)],
-            'parent_id'=>['nullable',Rule::exists('organisations','id',$this->parent_id)],
+            'organisation_type_id'=>['required','exists:organisation_types,id'],
+            'wilayah_id'=>['required','exists:wilayah,id'],
+            'parent_id'=>['nullable','exists:organisations,id'],
         ];
     }
 }

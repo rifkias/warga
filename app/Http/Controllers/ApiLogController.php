@@ -7,6 +7,8 @@ use App\Models\Admin\Menu;
 use App\Models\Admin\MenuPermission;
 use App\Models\Admin\Role;
 use App\Models\Master\Wilayah;
+use App\Models\Admin\Organisation;
+use App\Models\Admin\OrganisationType;
 use Log,Auth,Session,File;
 class ApiLogController extends Controller
 {
@@ -59,6 +61,21 @@ class ApiLogController extends Controller
     public function getWilayahList()
     {
         return Wilayah::select(['id','kelurahan','rt','rw'])->get();
+    }
+    public function getOrganisationType()
+    {
+        return OrganisationType::get();
+    }
+
+    public function getOrganisationList()
+    {
+        $data;
+        if(!Auth::user()->role()->first()->name == 'superadmin'){
+            $data = Organisation::where('id',Auth::user()->organisation_id)->orWhere('parent_id',Auth::user()->organisation_id)->get();
+        }else{
+            $data = Organisation::get();
+        }
+        return $data;
     }
     public function getMenu()
     {

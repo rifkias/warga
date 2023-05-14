@@ -19,19 +19,22 @@ class UserController extends Controller
     public function index()
     {
         $this->data['roles'] = $this->ApiLog->getRoleList();
-        $this->data['wilayahs'] = $this->ApiLog->getWilayahList();
+        $this->data['organisasi'] = $this->ApiLog->getOrganisationList();
         return view('main.admin.users')->with($this->data);
     }
     public function dataTables(Request $request)
     {
-        $datas = User::with(['role','wilayah']);
-        $datas->where('id','!=',Auth::user()->id);
-        $datas->orderBy('created_at','desc');
+        $datas = User::with(['role','organisation','organisation.type','organisation.wilayah']);
+        $datas =$datas->where('id','!=',Auth::user()->id);
+        if(auth()->user()->getRoles() <> 'superadmin'){
+            $datas = $datas->whereIn('organisation_id',auth()->user()->getOrganisationList());
+        }
+        $datas =$datas->orderBy('created_at','desc');
         return Datatables::of($datas)
         ->addIndexColumn()
         ->removeColumn('id')
         ->addColumn('wilayahName',function($data){
-            return $data->wilayah->wilayah_name;
+            return $data->organisation->wilayah->wilayah_name;
         })
         ->addColumn('action',function($data){
             $button = "

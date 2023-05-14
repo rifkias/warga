@@ -11,7 +11,7 @@
     <nav class="page-breadcrumb">
         <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">Master Data</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Organisation</li>
+        <li class="breadcrumb-item active" aria-current="page">House</li>
         </ol>
   </nav>
 
@@ -30,9 +30,9 @@
               <thead>
                 <tr>
                     <th>No</th>
+                    <th>House Number</th>
+                    <th>House Type</th>
                     <th>Wilayah</th>
-                    <th>Type</th>
-                    <th>Parent</th>
                     <th>Action</th>
                 </tr>
               </thead>
@@ -55,21 +55,44 @@
           </button>
         </div>
         <div class="modal-body">
-          <form method="POST" action="/dashboard/master-data/role/add" id="formData" enctype="multipart/form-data">
-                @csrf
-                <input type="hidden" name="id" id="id">
-                <div class="form-group mb-2">
-                    <label for="typeSelect" class="mb-0 required">Type</label>
-                    <select name="organisation_type_id" id="typeSelect" required class="select2 w-100 @error('organisation_type_id') is-invalid @enderror">
-                        <option value="" selected>&nbsp;</option>
-
-                    </select>
-                    @error('organisation_type_id')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
+          <form method="POST" action="" id="formData">
+            @csrf
+            <input type="hidden" name="id" id="id">
+            <div class="form-group mb-2">
+                <label for="house_number" class="mb-0 required">House Number</label>
+                <input type="text" value="{{old('house_number')}}" required class="form-control @error('house_number') is-invalid @enderror" name="house_number" id="house_number" placeholder="House Number">
+                @error('house_number')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+            </div>
+            <div class="form-group mb-2">
+                <label for="house_type" class="mb-0 required">House Type</label>
+                <select name="house_type" required id="house_type" class="select2 w-100 @error('house_type') is-invalid @enderror">
+                    <option @if(old('house_type') == 'pribadi') selected @endif value="pribadi">Pribadi</option>
+                    <option @if(old('house_type') == 'kontrakan') selected @endif value="kontrakan">Kontrakan</option>
+                </select>
+                @error('house_type')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+            </div>
+            <div class="form-group mb-2">
+                <label for="organisation_id" class="mb-0 required">Wilayah</label>
+                <select name="organisation_id" id="organisation_id" class="select2 w-100 @error('organisation_id') is-invalid @enderror">
+                    <option value="" selected>&nbsp;</option>
+                    @foreach ($wilayah as $item)
+                        <option @if(old('organisation_id') == $item->id) selected @endif value="{{$item->id}}">{{$item->wilayah->wilayah_name}}</option>
+                    @endforeach
+                </select>
+                @error('organisation_id')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -86,13 +109,12 @@
     <script src="{{ asset('assets/plugins/datatables-net-bs4/dataTables.bootstrap4.js') }}"></script>
     <script src="{{ asset('assets/plugins/select2/select2.min.js') }}"></script>
   <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-  <script src="{{ asset('assets/js/file-upload.js') }}"></script>
 
 @endpush
 
 @push('custom-scripts')
 <script>
-        var link = '/dashboard/master-data/organisation';
+        var link = '/dashboard/master-data/house';
         var aTable;
     $(document).ready( function () {
         $(function() {
@@ -103,7 +125,6 @@
                     serverSide: true,
                     lengthChange:false,
                     searching:true,
-                    searchDelay: 3000,
                     ajax: {
                         url:link+'/get-data',
                     },
@@ -112,10 +133,9 @@
                     ],
                     columns: [
                         { data: 'DT_RowIndex', name: 'DT_RowIndex',autoWidth: true,orderable:false,searchable:false},
-                        { data: 'wilayah_id', name: 'wilayah_id',autoWidth: true },
-                        { data: 'organisation_type_id', name: 'organisation_type_id',autoWidth: true },
-
-                        { data: 'parent_id', name: 'parent_id',autoWidth: true },
+                        { data: 'house_number', name: 'house_number',autoWidth: true },
+                        { data: 'house_type', name: 'house_type',autoWidth: true },
+                        { data: 'wilayahName', name: 'wilayahName',autoWidth: true },
                         {data:'action',name:'action',orderable:false,searchable:false},
                     ],
                     "aLengthMenu": [
@@ -150,39 +170,14 @@
                     width:'100%'
                 });
             }
-            if ($("#typeSelect").length) {
-                $("#typeSelect").select2({
-                    width:'100%',
-                    delay:1800,
-                    selectOnClose: true,
-                    ajax:{
-                        url:'/dashboard/config/organisation-type/get-data',
-                        dataType: 'json',
-                        quietMillis: 100,
-                        data:function(param){
-                            var query ={
-                                name:param.term,
-                            }
-                            return query;
-                        },
-                        processResults:function(res){
-                            return {
-                                results: $.map(res.data,function(obj){
-                                    return {id:obj.id,text:obj.name}
-                                })
-                            };
-                        }
-                    },
-                });
-            }
         });
         @if(count($errors) > 0)
             @if(old('id'))
                 $('#dataModalTitle').text("Edit Data");
-                $('#password').attr('required',false);
+                $('#formData').attr('action',link+'/add');
             @else
-                $('#dataModalTitle').text("Add Data");
-                $('#password').attr('required',true);
+                $('#dataModalTitle').text("Ad`d Data");
+                $('#formData').attr('action',link+'/add');
             @endif
             $('#dataModal').modal('show');
         @endif
@@ -191,28 +186,6 @@
         $('#dataModalTitle').text("Add Data");
         $('#name').val('');
         $('#formData').attr('action',this.link+'/add');
-        $('#emailField').attr('value','');
-        $('#password').val('');
-        $('#password').attr('required',true);
-        $('#status').val('active').trigger('change');
-        $('#role').val('').trigger('change');
-        $('#id').val('');
-        $('#wilayah').val('').trigger('change');
-        $('#picture').val('');
-    }
-    function ShowDetail(data){
-        console.log(data);
-        $('#formData').attr('action',this.link+'/update');
-        $('#dataModalTitle').text("Edit Data");
-        $('#name').val(data.name);
-        $('#id').val(data.id);
-        $('#emailField').attr('value',data.email);
-        $('#password').attr('required',false);
-        $('#status').val(data.status);
-        $('#role').val(data.role_id).trigger('change');
-        $('#wilayah').val(data.wilayah_id).trigger('change');
-        $('#dataModal').modal('show');
-
     }
     // Ajax CRUD
     function addData(){
@@ -267,26 +240,6 @@
                         toastr.error('Ada Kesalahan Sistem, silakan hubungi pengembang sistem');
                     }
                 });
-            }
-        });
-    }
-    function Edit(id) {
-        $.ajax({
-            url : this.link+'/show',
-            type : 'POST',
-            data : {'id':id},
-            cache: false,
-            success:function(datas) {
-                clearData();
-                if(datas.status == 200){
-                    console.log(datas);
-                   ShowDetail(datas.data);
-                }else{
-                    toastr.error('Ada Kesalahan Sistem, silakan hubungi pengembang sistem');
-                }
-            },
-            error:function(){
-                toastr.error('Ada Kesalahan Sistem, silakan hubungi pengembang sistem');
             }
         });
     }

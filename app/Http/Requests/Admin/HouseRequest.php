@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class WilayahRequest extends FormRequest
+class HouseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +24,8 @@ class WilayahRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'provinsi'=>['required'],
-            // 'kabupaten'=>['required'],
-            // 'kecamatan'=>['required'],
-            // 'kelurahan'=>['required'],
-            'kode_pos'=>['required','numeric',"digits:5"],
-            'rw'=>['required','numeric',"digits:3"],
-            'rt'=>['nullable','numeric',"digits:3"],
+            'house_number'=>['required','numeric'],
+            'house_type'=>['required'],
         ];
     }
 }

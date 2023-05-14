@@ -5,6 +5,7 @@ namespace App\Models\Admin;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Admin\Organisation;
 use Hash,Log;
 use App\Http\Controllers\ApiLogController as ApiLog;
 class User extends Authenticatable
@@ -75,5 +76,20 @@ class User extends Authenticatable
     public function role()
     {
         return $this->hasOne(Role::class,'id','role_id');
+    }
+    public function organisation()
+    {
+        return $this->hasOne(Organisation::class,'id','organisation_id');
+    }
+
+    public function getRoles()
+    {
+        return User::role()->first()->name;
+    }
+    public function getOrganisationList()
+    {
+        $organisation = Organisation::with('childs')->find(auth()->user()->organisation_id);
+        $organisationIds = $organisation->childs->pluck("id")->push($organisation->id);
+        return $organisationIds;
     }
 }
